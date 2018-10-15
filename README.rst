@@ -4,21 +4,21 @@ Assumptions
 -----------
 * Assumes all questions are of the form:: latex
 
-\begin{problem}
+    \begin{problem}
 
-    Text/etc to keep at top
+        Text/etc to keep at top
 
-    \begin{mchoice}
-    Text/etc to keep at top
+        \begin{mchoice}
+        Text/etc to keep at top
 
-    \item (or \xtem) anwer choice text
-    \item (or \xtem) anwer choice text
-    .
-    .
-    .
-    \item (or \xtem) anwer choice text
-    \end{mchoice}
-\end{problem}
+        \item (or \xtem) anwer choice text
+        \item (or \xtem) anwer choice text
+        .
+        .
+        .
+        \item (or \xtem) anwer choice text
+        \end{mchoice}
+    \end{problem}
 
 
 Usage

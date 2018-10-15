@@ -1,6 +1,7 @@
 A tool for randomizing QA ordering in latex exams
 
-Assumptions:
+Assumptions
+-----------
 * Assumes all questions are of the form::
 
     \begin{problem}

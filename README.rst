@@ -2,7 +2,7 @@ A tool for randomizing QA ordering in latex exams
 
 Assumptions
 -----------
-* Assumes all questions are of the form:: latex
+* Assumes all questions are of the form::
 
     \begin{problem}
 
@@ -23,12 +23,12 @@ Assumptions
 
 Usage
 -----
-For a first time test, try:: bash
+For a first time test, try::
 
     $ python randomize.py test/section_*.tex
 
 
-For more options/help:: bash
+For more options/help::
 
     $ python randomize.py -h
 

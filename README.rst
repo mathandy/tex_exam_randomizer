@@ -41,5 +41,6 @@ For more options/help::
 
 License
 -------
-MIT licensed (Andy Port, October 2018)  
+MIT licensed (Andy Port, October 2018)
+
 Exception: "test" directory contents not licensed -- these tex/cls files came from unknown sources

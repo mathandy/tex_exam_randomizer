@@ -26,7 +26,14 @@ Assumptions:
 
 Usage
 -----
-For a first time test, try::
+If using a master file whose sections are fetched with `input{}`
+statements, use the `-m` flag. E.g.::
+
+    $ python randomize.py -m test/base.tex
+
+
+To randomize the problems and answers in a file with no fixed sections,
+omit the `-m` flag.  E.g.::
 
     $ python randomize.py test/section_*.tex
 
@@ -131,6 +138,14 @@ def randomize(problem_list, fix_questions=False, fix_answers=False):
     return problem_list
 
 
+def postfix_tag(k, num_versions):
+    if num_versions <= 26:
+        tags = 'abcdefghijklmnopqrstuvwxyz'
+    else:
+        tags = map(str, range(num_versions))
+    return '_ver_' + tags[k]
+
+
 def generate_randomized_versions(tex_file, num_versions=4,
                                  output_dir=os.getcwd(),
                                  fix_questions=False,
@@ -138,16 +153,11 @@ def generate_randomized_versions(tex_file, num_versions=4,
 
     problems, tex, marker = get_problems(filename=tex_file, debug=debug)
 
-    if num_versions <= 26:
-        tags = 'abcdefghijklmnopqrstuvwxyz'
-    else:
-        tags = map(str, range(num_versions))
-
     name, ext = os.path.splitext(os.path.basename(tex_file))
     for iv in range(num_versions):
         problems = randomize(problems, fix_questions, fix_answers)
         version_filename = \
-            os.path.join(output_dir, name + '_ver_' + tags[iv] + ext)
+            os.path.join(output_dir, name + postfix_tag(iv, num_versions) + ext)
         version_tex = copy(tex)
 
         for k, p in enumerate(problems):
@@ -174,6 +184,40 @@ def generate_randomized_versions_multi(tex_files, num_versions=4,
                                      debug=debug)
 
 
+def generate_new_masters(master_filename, num_versions=4,
+                         output_dir=os.getcwd()):
+
+    with open(master_filename, 'r') as f:
+        tex = f.read()
+
+    _cw = os.getcwd()
+    os.chdir(os.path.dirname(os.path.abspath(master_filename)))
+    input_files = [m.group(1) for m in re.finditer(r'\input\{(.*?)\}', tex)]
+    input_files_abs = [os.path.abspath(fn) for fn in input_files]
+    os.chdir(_cw)
+
+    if num_versions <= 26:
+        tags = 'abcdefghijklmnopqrstuvwxyz'
+    else:
+        tags = map(str, range(num_versions))
+
+    name, ext = os.path.splitext(os.path.basename(master_filename))
+    for iv in range(num_versions):
+        postfix = postfix_tag(iv, num_versions)
+        version_tex = copy(tex)
+
+        for fn in input_files:
+            fn_base, fn_ext = os.path.splitext(os.path.basename(fn))
+            version_tex = version_tex.replace(fn, fn_base + postfix + fn_ext)
+
+        version_master_filename = os.path.join(output_dir, name + postfix + ext)
+        with open(version_master_filename, 'w') as f:
+            f.write(version_tex)
+        print(output_dir)
+        print('"%s" created' % version_master_filename)
+    return input_files_abs
+
+
 if __name__ == '__main__':
     import argparse
     args = argparse.ArgumentParser()
@@ -189,6 +233,12 @@ if __name__ == '__main__':
     args.add_argument('-a', '--fix_answers', default=False,
                       action='store_true',
                       help="Invoke to prevent randomization the answers.")
+    args.add_argument('-m', '--master', default=False,
+                      action='store_true',
+                      help="The input document is assumed to be a master "
+                           "document. Randomized versions of `\input{}` "
+                           "statements will generated to be used by generated "
+                           "versions of the master.")
     args.add_argument('-d', '--debug', default=False,
                       action='store_true',
                       help="Turn on debugging output.")
@@ -199,5 +249,16 @@ if __name__ == '__main__':
             "Invoking `-qa` fixes both questions and answers -- meaning "
             "generated versions would be identical to originals.")
 
-    print("Randomizing:", ', '.join(args['tex_files']))
-    generate_randomized_versions_multi(**args)
+    if args.pop('master'):
+        assert len(args['tex_files']) == 1, \
+            "If '-m' is invoked, only one master file can be input"
+        master_filename = args.pop('tex_files')[0]
+        input_files = generate_new_masters(master_filename,
+                                           num_versions=args['num_versions'],
+                                           output_dir=args['output_dir'])
+
+        print("Randomizing:", ', '.join(input_files))
+        generate_randomized_versions_multi(input_files, **args)
+    else:
+        print("Randomizing:", ', '.join(args['tex_files']))
+        generate_randomized_versions_multi(**args)

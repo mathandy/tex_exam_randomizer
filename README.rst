@@ -1,7 +1,6 @@
 A tool for randomizing QA ordering in latex exams
 
-Assumptions
------------
+Assumptions:
 * Assumes all questions are of the form::
 
     \begin{problem}
@@ -23,7 +22,14 @@ Assumptions
 
 Usage
 -----
-For a first time test, try::
+If using a master file whose sections are fetched with `input{}`
+statements, use the `-m` flag. E.g.::
+
+    $ python randomize.py -m test/base.tex
+
+
+To randomize the problems and answers in a file with no fixed sections,
+omit the `-m` flag.  E.g.::
 
     $ python randomize.py test/section_*.tex
 

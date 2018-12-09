@@ -196,11 +196,6 @@ def generate_new_masters(master_filename, num_versions=4,
     input_files_abs = [os.path.abspath(fn) for fn in input_files]
     os.chdir(_cw)
 
-    if num_versions <= 26:
-        tags = 'abcdefghijklmnopqrstuvwxyz'
-    else:
-        tags = map(str, range(num_versions))
-
     name, ext = os.path.splitext(os.path.basename(master_filename))
     for iv in range(num_versions):
         postfix = postfix_tag(iv, num_versions)
